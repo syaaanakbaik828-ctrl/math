@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Matematika</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    h1 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+    #game-box {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      width: 360px;
+    }
+    #soal {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+    input, select {
+      padding: 8px;
+      font-size: 18px;
+      margin: 5px 0;
+      text-align: center;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 85%;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    #score, #timer {
+      margin-top: 15px;
+      font-size: 18px;
+      color: #222;
+    }
+    #timer {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Game Matematika</h1>
+  <div id="game-box">
+    <label for="level">Pilih Level:</label><br>
+    <select id="level" onchange="buatSoal()">
+      <option value="mudah">Mudah (1-10)</option>
+      <option value="sedang">Sedang (1-50)</option>
+      <option value="sulit">Sulit (1-100)</option>
+      <option value="agak">Agak Sulit (1-500)</option>
+      <option value="sangat">Sangat Sulit (1-1000)</option>
+    </select>
+    <br><br>
+    <label for="operasi">Pilih Operasi:</label><br>
+    <select id="operasi" onchange="buatSoal()">
+      <option value="+">Penjumlahan (+)</option>
+      <option value="-">Pengurangan (-)</option>
+      <option value="*">Perkalian (×)</option>
+      <option value="/">Pembagian (÷)</option>
+    </select>
+    <hr>
+    <div id="soal">Soal akan muncul di sini</div>
+    <input type="number" id="jawaban" placeholder="Masukkan jawaban">
+    <br>
+    <button onclick="cekJawaban()">Jawab</button>
+    <div id="score">Skor: 0</div>
+    <div id="timer">Waktu: 30</div>
+  </div>
+
+  <script>
+    let angka1, angka2, hasil;
+    let skor = 0;
+    let waktu = 30;
+    let timerInterval;
+
+    function getBatasLevel() {
+      let level = document.getElementById("level").value;
+      switch(level) {
+        case "mudah": return 10;
+        case "sedang": return 50;
+        case "sulit": return 100;
+        case "agak": return 500;
+        case "sangat": return 1000;
+        default: return 20;
+      }
+    }
+
+    function buatSoal() {
+      let batas = getBatasLevel();
+      let operasi = document.getElementById("operasi").value;
+
+      angka1 = Math.floor(Math.random() * batas) + 1;
+      angka2 = Math.floor(Math.random() * batas) + 1;
+
+      if (operasi === "/") {
+        hasil = angka1;
+        angka1 = angka1 * angka2; // supaya hasil bulat
+      } else if (operasi === "-") {
+        if (angka2 > angka1) [angka1, angka2] = [angka2, angka1]; // tidak negatif
+        hasil = angka1 - angka2;
+      } else if (operasi === "+") {
+        hasil = angka1 + angka2;
+      } else if (operasi === "*") {
+        hasil = angka1 * angka2;
+      }
+
+      document.getElementById("soal").innerText = angka1 + " " + operasi + " " + angka2 + " = ?";
+      resetTimer();
+    }
+
+    function cekJawaban() {
+      let jawaban = document.getElementById("jawaban").value;
+      if (jawaban == hasil) {
+        skor++;
+        alert("Benar! 🎉");
+      } else {
+        skor = 0;
+        alert("Salah 😅. Skor kembali ke 0. Jawaban yang benar: " + hasil);
+      }
+      document.getElementById("score").innerText = "Skor: " + skor;
+      document.getElementById("jawaban").value = "";
+      buatSoal();
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      waktu = 30;
+      document.getElementById("timer").innerText = "Waktu: " + waktu;
+
+      timerInterval = setInterval(() => {
+        waktu--;
+        document.getElementById("timer").innerText = "Waktu: " + waktu;
+        if (waktu <= 0) {
+          clearInterval(timerInterval);
+          skor = 0;
+          alert("Waktu habis! ⏳ Skor kembali ke 0.");
+          document.getElementById("score").innerText = "Skor: " + skor;
+          buatSoal();
+        }
+      }, 1000);
+    }
+
+    // Jalankan pertama kali
+    buatSoal();
+  </script>
+</body>
+</html>
